@@ -3,19 +3,21 @@ const mongoose = require("mongoose");
 
 mongoose.connect(`mongodb://127.0.0.1:27017/${process.env.DB_NAME}`);
 
-const recipeSchema = new mongoose.Schema(
+const reviewSchema = new mongoose.Schema(
   {
-    name: String,
-    description: String,
-    ingredients: Array,
-    steps: Array,
-    favorite: Boolean,
-    views: Number,
-    image_id: String
-  },
-  { timestamps: true } // will automatically create and set `createdAt` and `updatedAt` timestamps
+    review_id: Number,
+    rating: Number,
+    summary: String,
+    recommend: Boolean,
+    response: String,
+    body: String,
+    date: String,
+    reviewer_name: String,
+    helpfulness: Number,
+    photos: Array
+  }
 );
 
-const Recipe = new mongoose.model('Recipe', recipeSchema); //  TODO: Fill in arguments!
+const Review = new mongoose.model('Review', reviewSchema);
 
-module.exports = Recipe;
+module.exports = Review;
