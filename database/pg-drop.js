@@ -17,7 +17,28 @@ pool.query('DROP TABLE reviews', (err, res) => {
   if (err) {
     console.log(err);
   } else {
-    console.log('reviews table dropped:', res);
-    pool.end();
+    console.log('reviews table dropped');
+    pool.query('DROP TABLE characteristics', (err, res) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('characteristics table dropped');
+        pool.query('DROP TABLE characteristic_review', (err, res) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('characteristic_review table dropped');
+            pool.query('DROP TABLE reviews_photos', (err, res) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log('reviews_photos table dropped');
+                pool.end();
+              }
+            });
+          }
+        });
+      }
+    });
   }
 });
