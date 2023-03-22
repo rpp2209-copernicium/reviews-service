@@ -2,27 +2,8 @@ require("dotenv").config();
 const express = require('express');
 const app = express();
 const port = 3000;
-const path = require('path');
-const { Pool, Client } = require('pg');
-const pool = new Pool({
-  user: 'fig',
-  host: 'localhost',
-  database: 'reviews',
-  password: '',
-  port: 5432
-});
-
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
-
-
-//CONNECT TO DB
-pool.connect()
-  .then((res) => {
-    console.log('connected');
-  });
-//connect to postgres db
-//  initially to localhost
 
 //ROUTES
 
