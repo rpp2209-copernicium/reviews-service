@@ -2,7 +2,9 @@ require("dotenv").config();
 const express = require('express');
 const app = express();
 const port = 3000;
-app.use(express.urlencoded({extended: false}));
+const { fetchReviews } = require('./helpers.js');
+const { fetchMeta } = require('./helpers.js');
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 //ROUTES
@@ -17,9 +19,14 @@ app.get('/reviews', (req, res) => {
   //if not specified, default page === 1
 
   //use the params to query the db
-  //send data back to the client
-  res.status(200);
-  res.send('data');
+  fetchReviews((err, result) => {
+    if (err) {
+      console.log(err);
+      res.sendStatus(400);
+    } else {
+      res.status(200).send(result);
+    }
+  }, prodId, sortBy, resultCount, resultPages);
 });
 
 app.get('/reviews/meta', (req, res) => {
