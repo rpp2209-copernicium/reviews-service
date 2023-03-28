@@ -61,10 +61,22 @@ pool.query(`CREATE TABLE IF NOT EXISTS reviews (
               value integer
             )`, (err, res) => {
               if (err) {
-                console.log('error creating characteristic_review table');
+                console.log('error creating characteristic_averages table');
               } else {
-                console.log('characteristic_reviews table created');
-                pool.end();
+                pool.query(`CREATE TABLE IF NOT EXISTS characteristic_averages (
+                  id integer,
+                  product_id integer,
+                  characteristic_name text,
+                  characteristic_id,
+                  average_value integer
+                )`, (err, res) => {
+                  if (err) {
+                    console.log('error creating characteristic_review table');
+                  } else {
+                    console.log('characteristic_reviews table created');
+                    pool.end();
+                  }
+                });
               }
             });
           }
@@ -73,6 +85,7 @@ pool.query(`CREATE TABLE IF NOT EXISTS reviews (
     });
   }
 });
+
 
 
 //USING PROMISES (seemed to only create reviews table)

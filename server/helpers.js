@@ -56,7 +56,7 @@ var fetchReviews = (callback, productId, sort, count, page) => {
 };
 
 //FETCH REVIEW METADATA FOR A GIVEN PRODUCT
-var fetchMeta = () => {
+var fetchMeta = (prodId, callback) => {
 
 };
 
