@@ -56,8 +56,36 @@ var fetchReviews = (callback, productId, sort, count, page) => {
 };
 
 //FETCH REVIEW METADATA FOR A GIVEN PRODUCT
-var fetchMeta = (prodId, callback) => {
 
+// var fetchMeta = (prodId, callback) => {
+//   //calm down you got this
+// };
+
+//INSERT REVIEW INTO REVIEWS TABLE
+
+var insertReview = (prodId, rating, summary, body, recommend, name, email, photos, characteristics) => {
+
+  pool.connect();
+
+  //insert initial values into reviews table
+  pool.query(`INSERT INTO reviews (product_id, rating, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
+  VALUES (${prodId}, ${rating}, ${summary}, ${body}, ${recommend}, false, ${name}, ${email}, null, 0)`, (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      //iterate over the array of photo urls??
+      //run insert query at every iteration
+      pool.query(`INSERT INTO reviews_photos (product_id, url)
+      VALUES (${prodId}, ${currentUrl})`);
+    }
+  });
+
+
+
+  //add characteristics into characteristic table
+  //characteristics object Object of keys representing characteristic_id and
+  //values representing the review value for that characteristic.
+  //{ "14": 5, "15": 5 //...}
 };
 
 module.exports.fetchReviews = fetchReviews;

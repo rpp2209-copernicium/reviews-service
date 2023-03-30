@@ -12,13 +12,8 @@ app.use(express.json());
 app.get('/reviews', (req, res) => {
   var prodId = req.query.product_id;
   var sortBy = req.query.sort;
-  //sort by options are newest, helpful, or relevant
   var resultCount = req.query.count;
-  //if not specified, default count === 5
   var resultPages = req.query.page;
-  //if not specified, default page === 1
-
-  //use the params to query the db
   fetchReviews((err, result) => {
     if (err) {
       console.log(err);
@@ -46,6 +41,8 @@ app.post('/reviews', (req, res) => {
   var email = req.body.email;
   var photos = req.body.photos;
   var characteristics = req.body.characteristics;
+  console.log('photos', photos);
+  console.log('chars', characteristics);
   res.sendStatus(201);
 });
 
