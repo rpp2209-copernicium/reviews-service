@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+/* eslint-disable indent */
 const path = require('path');
 const { Pool, Client } = require('pg');
 const pool = new Pool({
@@ -57,9 +59,30 @@ var fetchReviews = (callback, productId, sort, count, page) => {
 
 //FETCH REVIEW METADATA FOR A GIVEN PRODUCT
 
-// var fetchMeta = (prodId, callback) => {
-//   //calm down you got this
-// };
+var fetchMeta = (prodId, callback) => {
+
+  pool.connect();
+
+
+  pool.query(`SELECT id FROM characteristics
+  WHERE product_id = ${prodId}
+  GROUP BY name`, (err, result) => {
+    if (err) {
+      callback(err);
+    } else {
+      var charRows = result.rows;
+      callback(null, charRows);
+
+    }
+  });
+
+  //query the characteristics table to find all the characteristic ids associated with the product
+  //iterate over the characteristic ids
+  //for each characteristic id...
+  //grab the characteristic name
+  //query the characteristic_review table for all results with the current characteristic id
+   //calculate the average of all the values in the value row
+};
 
 //INSERT REVIEW INTO REVIEWS TABLE
 
@@ -89,4 +112,4 @@ var insertReview = (prodId, rating, summary, body, recommend, name, email, photo
 };
 
 module.exports.fetchReviews = fetchReviews;
-module.exports.fetchMeta = fetchReviews;
+module.exports.fetchMeta = fetchMeta;

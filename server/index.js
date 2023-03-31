@@ -26,8 +26,14 @@ app.get('/reviews', (req, res) => {
 
 app.get('/reviews/meta', (req, res) => {
   var prodId = req.query.product_id;
-  res.status(200);
-  res.send('meta data');
+  fetchMeta(prodId, (err, result) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(200);
+      res.send(result);
+    }
+  });
 });
 
 app.post('/reviews', (req, res) => {
