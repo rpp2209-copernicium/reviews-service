@@ -38,6 +38,7 @@ app.get('/reviews/meta', (req, res) => {
 
 app.post('/reviews', (req, res) => {
   //req.body will access data sent in the axios req at the 'data' property
+  //set default values for body parameters that are optional
   var prodId = req.body.product_id;
   var rating = req.body.rating;
   var summary = req.body.summary;

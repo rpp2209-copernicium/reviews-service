@@ -58,7 +58,6 @@ var fetchReviews = (callback, productId, sort, count, page) => {
 };
 
 //FETCH REVIEW METADATA FOR A GIVEN PRODUCT
-
 var fetchMeta = (prodId, callback) => {
   pool.connect();
   var metadata = {
@@ -149,28 +148,49 @@ var fetchMeta = (prodId, callback) => {
   });
 };
 
-//insert into the end of the last else block
-// callback(null, metadata);
-
 //INSERT REVIEW INTO REVIEWS TABLE
-
-var insertReview = (prodId, rating, summary, body, recommend, name, email, photos, characteristics) => {
+var insertReview = (prodId, rating, summary, body, recommend, name, email, photos, characteristics, callback) => {
 
   pool.connect();
 
-  //insert initial values into reviews table
+  //INSERT INTO REVIEWS TABLE
   pool.query(`INSERT INTO reviews (product_id, rating, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
   VALUES (${prodId}, ${rating}, ${summary}, ${body}, ${recommend}, false, ${name}, ${email}, null, 0)`, (err, result) => {
     if (err) {
-      console.log(err);
+      callback(err);
     } else {
-      //iterate over the array of photo urls??
-      //run insert query at every iteration
-      pool.query(`INSERT INTO reviews_photos (product_id, url)
-      VALUES (${prodId}, ${currentUrl})`);
+      var ids = [];
+      for (var i = 0; i < photos.length; i++) {
+        ids.push(prodId);
+      }
+      //INSERT PHOTO URLS INTO REVIEWS_PHOTOS TABLE
+      pool.query(`INSERT INTO reviews_photos (id, url) (SELECT * FROM unnest(${ids},${photos}))`, (err, res) => {
+        if (err) {
+          callback(err);
+        } else {
+          //INSERT CHARACTERISTIC INTO
+        }
+      });
+
+      // //create stub of query string
+      // var query2 = `INSERT INTO reviews_photos (id, url) VALUES`;
+      // //iterate over the array of photo urls
+      // for (var i = 0; i < photos.length; i++) {
+      //   // at every element, concatenate the product id, and url in parens separated by comma ending with comma
+      //   query += ` (${prodId}, ${photos[i]})`;
+      //   if (i < photos.length - 1) {
+      //     query += `,`;
+      //   }
+      // }
+      //call query method and pass the query string
     }
   });
 
+      // INSERT INTO reviews_photos (product_id, url)
+      // VALUES
+      //   (id, url),
+      //   (id, url),
+      //   (id, url)
 
 
   //add characteristics into characteristic table
