@@ -14,82 +14,84 @@ pool.connect();
 
 //POPULATE DB
 
-// var photosPath = path.resolve(__dirname, '../../csv-data/reviews_photos.csv');
-// var reviewsPath = path.resolve(__dirname, '../../csv-data/reviews.csv');
-// var characteristicsPath = path.resolve(__dirname, '../../csv-data/characteristics.csv');
-// var characteristicReviewPath = path.resolve(__dirname, '../../csv-data/characteristic_review.csv');
-// pool.query(`COPY reviews_photos FROM '${photosPath}' DELIMITER ',' CSV HEADER;`, (err, res) => {
-//   if (err) {
-//     console.log('error copying reviews_photos');
-//   } else {
-//     console.log('reviews_photos copied');
-//     pool.query(`COPY reviews FROM '${reviewsPath}' DELIMITER ',' CSV HEADER;`, (err, res) => {
-//       if (err) {
-//         console.log('error copying reviews');
-//         pool.end();
-//       } else {
-//         console.log('reviews copied');
-//         pool.query(`COPY characteristics FROM '${characteristicsPath}' DELIMITER ',' CSV HEADER;`, (err, res) => {
-//           if (err) {
-//             console.log('error copying characteristics');
-//             pool.end();
-//           } else {
-//             console.log('characteristics copied');
-//             pool.query(`COPY characteristic_review FROM '${characteristicReviewPath}' DELIMITER ',' CSV HEADER;`, (err, res) => {
-//               if (err) {
-//                 console.log('error copying characteristic_reviews');
-//                 pool.end();
-//               } else {
-//                 console.log('characteristic_reviews copied');
-//                 pool.end();
-//               }
-//             });
-//           }
-//         });
-//       }
-//     });
-//   }
-// });
+var photosPath = path.resolve(__dirname, '../../csv-data/reviews_photos.csv');
+var reviewsPath = path.resolve(__dirname, '../../csv-data/reviews.csv');
+var characteristicsPath = path.resolve(__dirname, '../../csv-data/characteristics.csv');
+var characteristicReviewPath = path.resolve(__dirname, '../../csv-data/characteristic_review.csv');
+pool.query(`COPY reviews_photos FROM '${photosPath}' DELIMITER ',' CSV HEADER;`, (err, res) => {
+  if (err) {
+    console.log('error copying reviews_photos');
+  } else {
+    console.log('reviews_photos copied');
+    pool.query(`COPY reviews FROM '${reviewsPath}' DELIMITER ',' CSV HEADER;`, (err, res) => {
+      if (err) {
+        console.log('error copying reviews');
+        pool.end();
+      } else {
+        console.log('reviews copied');
+        pool.query(`COPY characteristics FROM '${characteristicsPath}' DELIMITER ',' CSV HEADER;`, (err, res) => {
+          if (err) {
+            console.log('error copying characteristics');
+            pool.end();
+          } else {
+            console.log('characteristics copied');
+            pool.query(`COPY characteristic_review FROM '${characteristicReviewPath}' DELIMITER ',' CSV HEADER;`, (err, res) => {
+              if (err) {
+                console.log('error copying characteristic_reviews');
+                pool.end();
+              } else {
+                console.log('characteristic_reviews copied');
+                pool.end();
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+});
+
+
 
 //ADD CHARACTERISTIC NAME TO EVERY ROW IN characteristic_review
 
 //grab every characteristic id
-pool.query('SELECT characteristic_id FROM characteristic_review;')
-  .then((result) => {
-  //iterate over the ids
-    var charIds = result.rows;
-    console.log(charIds[0]);
-    for (var i = 0; i < charIds.length; i++) {
-      //at each id
-      var currentId = charIds[i];
-      //find the characteristic name
-      pool.query(`SELECT name FROM characteristics WHERE id=${currentId}`)
-        .then((result) => {
-          var charName = result[0].name;
-          console.log(charName);
-        });
-    }
-  //insert the characteristic name value into the characteristic name column of the characteristic_review table
-  });
+// pool.query('SELECT characteristic_id FROM characteristic_review;')
+//   .then((result) => {
+//   //iterate over the ids
+//     var charIds = result.rows;
+//     console.log(charIds[0]);
+//     for (var i = 0; i < charIds.length; i++) {
+//       //at each id
+//       var currentId = charIds[i];
+//       //find the characteristic name
+//       pool.query(`SELECT name FROM characteristics WHERE id=${currentId}`)
+//         .then((result) => {
+//           var charName = result[0].name;
+//           console.log(charName);
+//         });
+//     }
+//   //insert the characteristic name value into the characteristic name column of the characteristic_review table
+//   });
 
-pool.query('SELECT characteristic_id FROM characteristic_review;', (err, res) => {
-  if (err) {
-    console.log('level 1 error', err);
-  } else {
-    var charIds = result.rows;
-    console.log(charIds[0]);
-    for (var i = 0; i < charIds.length; i++) {
-      //at each id
-      var currentId = charIds[i];
-      //find the characteristic name
-      pool.query(`SELECT name FROM characteristics WHERE id=${currentId}`)
-        .then((result) => {
-          var charName = result[0].name;
-          console.log(charName);
-        });
-    }
-  }
-});
+// pool.query('SELECT characteristic_id FROM characteristic_review;', (err, res) => {
+//   if (err) {
+//     console.log('level 1 error', err);
+//   } else {
+//     var charIds = result.rows;
+//     console.log(charIds[0]);
+//     for (var i = 0; i < charIds.length; i++) {
+//       //at each id
+//       var currentId = charIds[i];
+//       //find the characteristic name
+//       pool.query(`SELECT name FROM characteristics WHERE id=${currentId}`)
+//         .then((result) => {
+//           var charName = result[0].name;
+//           console.log(charName);
+//         });
+//     }
+//   }
+// });
 
 
 //POPULATE CHARACTERISTIC_AVERAGES

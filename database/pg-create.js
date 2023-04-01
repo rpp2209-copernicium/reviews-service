@@ -32,7 +32,9 @@ pool.query(`CREATE TABLE IF NOT EXISTS reviews (
   reviewer_name text,
   reviewer_email text,
   response text,
-  helpfulness integer )`, (err, res) => {
+  helpfulness integer,
+  PRIMARY KEY (id)
+  )`, (err, res) => {
   if (err) {
     console.log('error creating reviews table:', err);
   } else {
@@ -40,7 +42,9 @@ pool.query(`CREATE TABLE IF NOT EXISTS reviews (
     pool.query(`CREATE TABLE IF NOT EXISTS characteristics (
       id integer,
       product_id integer,
-      name varchar)`, (err, res) => {
+      name varchar,
+      PRIMARY KEY (id)
+      )`, (err, res) => {
       if (err) {
         console.log('error creating characteristics table', err);
       } else {
@@ -58,25 +62,15 @@ pool.query(`CREATE TABLE IF NOT EXISTS reviews (
               id integer,
               characteristic_id integer,
               review_id integer,
-              value integer
+              value integer,
+              FOREIGN KEY (review_id)
+              REFERENCES reviews(id)
             )`, (err, res) => {
               if (err) {
                 console.log('error creating characteristic_review table');
               } else {
-                pool.query(`CREATE TABLE IF NOT EXISTS characteristic_averages (
-                  id integer,
-                  product_id integer,
-                  characteristic_name text,
-                  characteristic_id,
-                  average_value integer
-                )`, (err, res) => {
-                  if (err) {
-                    console.log('error creating characteristic_averages table');
-                  } else {
-                    console.log('characteristic_averages table created');
-                    pool.end();
-                  }
-                });
+                console.log('characteristic_review table created');
+                pool.end();
               }
             });
           }
@@ -85,6 +79,7 @@ pool.query(`CREATE TABLE IF NOT EXISTS reviews (
     });
   }
 });
+
 
 
 

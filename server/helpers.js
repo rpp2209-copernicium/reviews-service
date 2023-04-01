@@ -12,6 +12,8 @@ const pool = new Pool({
 
 //FETCH REVIEWS FOR A GIVEN PRODUCT
 var fetchReviews = (callback, productId, sort, count, page) => {
+  pool.connect();
+
   if (count) {
     var resultCount = count;
   } else {
@@ -27,8 +29,6 @@ var fetchReviews = (callback, productId, sort, count, page) => {
   } else if (resultPage >= 2) {
     var offSet = resultCount * (resultPage - 1);
   }
-
-  pool.connect();
 
   if (sort === 'newest' || sort === null) {
     var orderBy = 'date';
@@ -60,29 +60,97 @@ var fetchReviews = (callback, productId, sort, count, page) => {
 //FETCH REVIEW METADATA FOR A GIVEN PRODUCT
 
 var fetchMeta = (prodId, callback) => {
-
   pool.connect();
-
-
-  pool.query(`SELECT id FROM characteristics
-  WHERE product_id = ${prodId}
-  GROUP BY name`, (err, result) => {
+  var metadata = {
+    'product_id': prodId,
+    'ratings': {},
+    'recommended': {},
+    'characteristics': {}
+  };
+  //POPULATE CHARACTERISTICS OBJECT
+  pool.query(`SELECT characteristic_id, AVG(value), name, reviews.product_id
+  FROM characteristic_review
+  JOIN characteristics ON characteristic_id = characteristics.id
+  JOIN reviews ON review_id = reviews.id
+  WHERE reviews.product_id = 20
+  GROUP BY characteristic_id, name, reviews.product_id`, (err, result) => {
     if (err) {
       callback(err);
     } else {
       var charRows = result.rows;
-      callback(null, charRows);
-
+      var metaChars = metadata['characteristics'];
+      for (var i = 0; i < charRows.length; i++) {
+        var currentChar = charRows[i];
+        metaChars[currentChar.name] = {
+          'id': currentChar.characteristic_id,
+          'value': currentChar.avg
+        };
+      }
+      //POPULATE RATINGS OBJECT
+      pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 0`, (err, result) => {
+        if (err) {
+          console.log(error);
+        } else {
+          metadata['ratings']['0'] = result.rows[0].count;
+          pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 1`, (err, result) => {
+            if (err) {
+              callback(err);
+            } else {
+              metadata['ratings']['1'] = result.rows[0].count;
+              pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 2`, (err, result) => {
+                if (err) {
+                  callback(err);
+                } else {
+                  metadata['ratings']['2'] = result.rows[0].count;
+                  pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 3`, (err, result) => {
+                    if (err) {
+                      callback(err);
+                    } else {
+                      metadata['ratings']['3'] = result.rows[0].count;
+                      pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 4`, (err, result) => {
+                        if (err) {
+                          callback(err);
+                        } else {
+                          metadata['ratings']['4'] = result.rows[0].count;
+                          pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 5`, (err, result) => {
+                            if (err) {
+                              callback(err);
+                            } else {
+                              metadata['ratings']['5'] = result.rows[0].count;
+                              //POPULATE RECOMMENDED OBJECT
+                              pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND recommend = true`, (err, result) => {
+                                if (err) {
+                                  callback(err);
+                                } else {
+                                  metadata['recommended']['true'] = result.rows[0].count;
+                                  pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND recommend = false`, (err, result) => {
+                                    if (err) {
+                                      callback(err);
+                                    } else {
+                                      metadata['recommended']['false'] = result.rows[0].count;
+                                      callback(null, metadata);
+                                    }
+                                  });
+                                }
+                              });
+                            }
+                              });
+                            }
+                          });
+                        }
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
     }
   });
-
-  //query the characteristics table to find all the characteristic ids associated with the product
-  //iterate over the characteristic ids
-  //for each characteristic id...
-  //grab the characteristic name
-  //query the characteristic_review table for all results with the current characteristic id
-   //calculate the average of all the values in the value row
 };
+
+//insert into the end of the last else block
+// callback(null, metadata);
 
 //INSERT REVIEW INTO REVIEWS TABLE
 
