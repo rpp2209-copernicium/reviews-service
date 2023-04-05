@@ -159,45 +159,30 @@ var insertReview = (prodId, rating, summary, body, recommend, name, email, photo
     if (err) {
       callback(err);
     } else {
-      var ids = [];
-      for (var i = 0; i < photos.length; i++) {
-        ids.push(prodId);
-      }
-      //INSERT PHOTO URLS INTO REVIEWS_PHOTOS TABLE
-      pool.query(`INSERT INTO reviews_photos (id, url) (SELECT * FROM unnest(${ids},${photos}))`, (err, res) => {
-        if (err) {
-          callback(err);
-        } else {
-          //INSERT CHARACTERISTIC INTO
-        }
-      });
-
-      // //create stub of query string
-      // var query2 = `INSERT INTO reviews_photos (id, url) VALUES`;
-      // //iterate over the array of photo urls
+      console.log('insert into reviews result', result);
+      callback(null, result);
+      // var ids = [];
       // for (var i = 0; i < photos.length; i++) {
-      //   // at every element, concatenate the product id, and url in parens separated by comma ending with comma
-      //   query += ` (${prodId}, ${photos[i]})`;
-      //   if (i < photos.length - 1) {
-      //     query += `,`;
-      //   }
+      //   ids.push(prodId);
       // }
-      //call query method and pass the query string
+      //INSERT PHOTO URLS INTO REVIEWS_PHOTOS TABLE
+      // pool.query(`INSERT INTO reviews_photos (id, url) (SELECT * FROM unnest(${ids},${photos}))`, (err, res) => {
+      //   if (err) {
+      //     callback(err);
+      //   } else {
+      //     //INSERT INTO CHARACTERISTIC_REVIEW TABLE
+      //     //characteristics object:
+      //       //{ "14": 3, "15": 5, "16": 3, "17": 2}
+      //     //create an array of keys from characteristics object
+      //     var keys = Object.keys(characteristics);
+      //     var charIdOne = keys[0]
+      //     pool.query(`INSERT INTO characteristic_review (characteristic_id, review_id, value) VALUES (${ }), (${ }), (${ }), (${ })`)
+      //   }
+      // });
     }
   });
-
-      // INSERT INTO reviews_photos (product_id, url)
-      // VALUES
-      //   (id, url),
-      //   (id, url),
-      //   (id, url)
-
-
-  //add characteristics into characteristic table
-  //characteristics object Object of keys representing characteristic_id and
-  //values representing the review value for that characteristic.
-  //{ "14": 5, "15": 5 //...}
 };
 
 module.exports.fetchReviews = fetchReviews;
 module.exports.fetchMeta = fetchMeta;
+module.exports.insertReview = insertReview;

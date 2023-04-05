@@ -13,22 +13,22 @@ const pool = new Pool({
 pool.connect();
 
 //DROP TABLES
-pool.query('DROP TABLE reviews', (err, res) => {
+pool.query('DROP TABLE if exists reviews cascade', (err, res) => {
   if (err) {
     console.log(err);
   } else {
     console.log('reviews table dropped');
-    pool.query('DROP TABLE characteristics', (err, res) => {
+    pool.query('DROP TABLE if exists characteristics cascade', (err, res) => {
       if (err) {
         console.log(err);
       } else {
         console.log('characteristics table dropped');
-        pool.query('DROP TABLE characteristic_review', (err, res) => {
+        pool.query('DROP TABLE if exists characteristic_review cascade', (err, res) => {
           if (err) {
             console.log(err);
           } else {
             console.log('characteristic_review table dropped');
-            pool.query('DROP TABLE reviews_photos', (err, res) => {
+            pool.query('DROP TABLE if exists reviews_photos cascade', (err, res) => {
               if (err) {
                 console.log(err);
               } else {
