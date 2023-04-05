@@ -154,31 +154,32 @@ var insertReview = (prodId, rating, summary, body, recommend, name, email, photo
   pool.connect();
 
   //INSERT INTO REVIEWS TABLE
-  pool.query(`INSERT INTO reviews (product_id, rating, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
-  VALUES (${prodId}, ${rating}, ${summary}, ${body}, ${recommend}, false, ${name}, ${email}, null, 0)`, (err, result) => {
+  pool.query(`INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
+  VALUES (${prodId}, ${rating}, (EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)), '${summary}', '${body}', ${recommend}, false, '${name}', '${email}', null, 0)`, (err, result) => {
     if (err) {
       callback(err);
     } else {
       console.log('insert into reviews result', result);
-      callback(null, result);
-      // var ids = [];
-      // for (var i = 0; i < photos.length; i++) {
-      //   ids.push(prodId);
-      // }
+      var ids = [];
+      for (var i = 0; i < photos.length; i++) {
+        ids.push(prodId);
+      }
       //INSERT PHOTO URLS INTO REVIEWS_PHOTOS TABLE
-      // pool.query(`INSERT INTO reviews_photos (id, url) (SELECT * FROM unnest(${ids},${photos}))`, (err, res) => {
-      //   if (err) {
-      //     callback(err);
-      //   } else {
-      //     //INSERT INTO CHARACTERISTIC_REVIEW TABLE
-      //     //characteristics object:
-      //       //{ "14": 3, "15": 5, "16": 3, "17": 2}
-      //     //create an array of keys from characteristics object
-      //     var keys = Object.keys(characteristics);
-      //     var charIdOne = keys[0]
-      //     pool.query(`INSERT INTO characteristic_review (characteristic_id, review_id, value) VALUES (${ }), (${ }), (${ }), (${ })`)
-      //   }
-      // });
+      pool.query(`INSERT INTO reviews_photos (id, url) (SELECT * FROM unnest(${ids},${photos}))`, (err, res) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, result);
+
+          //INSERT INTO CHARACTERISTIC_REVIEW TABLE
+          //characteristics object:
+            //{ "14": 3, "15": 5, "16": 3, "17": 2}
+          //create an array of keys from characteristics object
+          // var keys = Object.keys(characteristics);
+          // var charIdOne = keys[0]
+          // pool.query(`INSERT INTO characteristic_review (characteristic_id, review_id, value) VALUES (${ }), (${ }), (${ }), (${ })`)
+        }
+      });
     }
   });
 };

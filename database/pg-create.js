@@ -21,7 +21,7 @@ pool.connect();
 // CREATE ALL TABLES
 
 pool.query(`CREATE TABLE IF NOT EXISTS reviews (
-  id BIGSERIAL,
+  id SERIAL,
   product_id integer,
   rating integer,
   date varchar,
