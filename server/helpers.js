@@ -159,13 +159,18 @@ var insertReview = (prodId, rating, summary, body, recommend, name, email, photo
     if (err) {
       callback(err);
     } else {
-      console.log('insert into reviews result', result);
+
+      //INSERT PHOTO URLS INTO REVIEWS_PHOTOS TABLE
+
       var ids = [];
       for (var i = 0; i < photos.length; i++) {
         ids.push(prodId);
       }
-      //INSERT PHOTO URLS INTO REVIEWS_PHOTOS TABLE
-      pool.query(`INSERT INTO reviews_photos (id, url) (SELECT * FROM unnest(${ids},${photos}))`, (err, res) => {
+      const query = 'INSERT INTO reviews_photos (product_id, url) SELECT * FROM unnest($1::INT[], $2::TEXT[])';
+      const values = [ids, photos];
+      console.log('query string', query);
+
+      pool.query(query, values, (err, result) => {
         if (err) {
           callback(err);
         } else {

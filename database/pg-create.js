@@ -50,7 +50,7 @@ pool.query(`CREATE TABLE IF NOT EXISTS reviews (
       } else {
         console.log('characteristics table created');
         pool.query(`CREATE TABLE IF NOT EXISTS reviews_photos (
-          id integer,
+          id SERIAL,
           product_id integer,
           url varchar
         )`, (err, res) => {

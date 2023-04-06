@@ -86,8 +86,7 @@ app.post('/reviews', (req, res) => {
       console.log(err);
       res.sendStatus(404);
     } else {
-      res.status(201);
-      res.send('success');
+      res.sendStatus(201);
     }
   });
 });
