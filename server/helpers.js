@@ -1,13 +1,14 @@
 /* eslint-disable camelcase */
 /* eslint-disable indent */
+require ('dotenv').config();
 const path = require('path');
 const { Pool, Client } = require('pg');
 const pool = new Pool({
-  user: 'fig',
-  host: 'localhost',
-  database: 'reviews',
-  password: '',
-  port: 5432
+  user: process.env.PGUSER,
+  host: process.env.PGHOST,
+  database: process.env.PGDATABASE,
+  password: process.env.PGPASSWORD,
+  port: process.env.PGPORT
 });
 
 //FETCH REVIEWS FOR A GIVEN PRODUCT
@@ -30,7 +31,7 @@ var fetchReviews = (callback, productId, sort, count, page) => {
     var offSet = resultCount * (resultPage - 1);
   }
 
-  if (sort === 'newest' || sort === null) {
+  if (sort === 'newest' || !sort) {
     var orderBy = 'date';
   } else if (sort === 'helpfulness') {
     var orderBy = 'helpfulness';
@@ -54,7 +55,6 @@ var fetchReviews = (callback, productId, sort, count, page) => {
     .catch((err) => {
       callback(err);
     });
-
 };
 
 //FETCH REVIEW METADATA FOR A GIVEN PRODUCT
@@ -155,26 +155,27 @@ var insertReview = (prodId, rating, summary, body, recommend, name, email, photo
 
   //INSERT INTO REVIEWS TABLE
   pool.query(`INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
-  VALUES (${prodId}, ${rating}, (EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)), '${summary}', '${body}', ${recommend}, false, '${name}', '${email}', null, 0)`, (err, result) => {
+  VALUES (${prodId}, ${rating}, (EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)), '${summary}', '${body}', ${recommend}, false, '${name}', '${email}', 'null', 0)`, (err, result) => {
     if (err) {
       callback(err);
     } else {
+      console.log(result);
+      callback(null, result);
 
       //INSERT PHOTO URLS INTO REVIEWS_PHOTOS TABLE
 
-      var ids = [];
-      for (var i = 0; i < photos.length; i++) {
-        ids.push(prodId);
-      }
-      const query = 'INSERT INTO reviews_photos (product_id, url) SELECT * FROM unnest($1::INT[], $2::TEXT[])';
-      const values = [ids, photos];
-      console.log('query string', query);
+      // var ids = [];
+      // for (var i = 0; i < photos.length; i++) {
+      //   ids.push(prodId);
+      // }
+      // const query = 'INSERT INTO reviews_photos (product_id, url) SELECT * FROM unnest($1::INT[], $2::TEXT[])';
+      // const values = [ids, photos];
+      // console.log('query string', query);
 
-      pool.query(query, values, (err, result) => {
-        if (err) {
-          callback(err);
-        } else {
-          callback(null, result);
+      // pool.query(query, values, (err, result) => {
+      //   if (err) {
+      //     callback(err);
+      //   } else {
 
           //INSERT INTO CHARACTERISTIC_REVIEW TABLE
           //characteristics object:
@@ -185,9 +186,9 @@ var insertReview = (prodId, rating, summary, body, recommend, name, email, photo
           // pool.query(`INSERT INTO characteristic_review (characteristic_id, review_id, value) VALUES (${ }), (${ }), (${ }), (${ })`)
         }
       });
-    }
-  });
-};
+    };
+  // });
+// };
 
 module.exports.fetchReviews = fetchReviews;
 module.exports.fetchMeta = fetchMeta;

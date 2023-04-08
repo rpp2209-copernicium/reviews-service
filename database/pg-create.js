@@ -52,7 +52,8 @@ pool.query(`CREATE TABLE IF NOT EXISTS reviews (
         pool.query(`CREATE TABLE IF NOT EXISTS reviews_photos (
           id SERIAL,
           product_id integer,
-          url varchar
+          url varchar,
+          PRIMARY KEY (id)
         )`, (err, res) => {
           if (err) {
             console.log('error creating reviews_photos table');

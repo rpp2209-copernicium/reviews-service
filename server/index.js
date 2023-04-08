@@ -37,7 +37,7 @@ app.get('/reviews/meta', (req, res) => {
   });
 });
 
-app.post('/reviews', (req, res) => {
+app.post('/reviews-table-insert', (req, res) => {
   //req.body will access data sent in the axios req at the 'data' property
   //set default values for body parameters that are optional
   var prodId = req.body.product_id;
@@ -91,15 +91,15 @@ app.post('/reviews', (req, res) => {
   });
 });
 
-app.put('/reviews/:review_id/helpful', (req, res) => {
-  var reviewId = req.params.review_id;
-  res.send(reviewId);
-});
+// app.put('/reviews/:review_id/helpful', (req, res) => {
+//   var reviewId = req.params.review_id;
+//   res.send(reviewId);
+// });
 
-app.put('/reviews/:review_id/report', (req, res) => {
-  var reviewId = req.params.review_id;
-  res.send(reviewId);
-});
+// app.put('/reviews/:review_id/report', (req, res) => {
+//   var reviewId = req.params.review_id;
+//   res.send(reviewId);
+// });
 
 app.listen(port, () => {
   console.log(`listening on port ${port}`);

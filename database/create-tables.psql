@@ -1,0 +1,35 @@
+CREATE TABLE "reviews" (
+  "id" SERIAL PRIMARY KEY,
+  "product_id" int,
+  "rating" int,
+  "date" varchar,
+  "summary" text,
+  "body" text,
+  "recommend" boolean,
+  "reported" boolean,
+  "reviewer_name" text,
+  "reviewer_email" text,
+  "response" text,
+  "helpfulness" int
+);
+
+CREATE TABLE "characteristics" (
+  "id" int PRIMARY KEY,
+  "product_id" int,
+  "name" varchar,
+);
+
+CREATE TABLE "reviews_photos" (
+  "id" SERIAL PRIMARY KEY,
+  "product_id" int,
+  "url" varchar,
+);
+
+CREATE TABLE "characteristic_review" (
+  "id" int,
+  "characteristic_id" int,
+  "review_id" int,
+  "value" int
+);
+
+ALTER TABLE "characteristic_review" ADD FOREIGN KEY ("review_id") REFERENCES "reviews" ("id");

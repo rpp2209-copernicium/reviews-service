@@ -1,0 +1,4 @@
+DROP TABLE "reviews";
+DROP TABLE "reviews_photos";
+DROP TABLE "characteristic_review";
+DROP TABLE "characteristics"
