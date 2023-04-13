@@ -7,8 +7,14 @@ const { fetchMeta } = require('./helpers.js');
 const { insertReview } = require('./helpers.js');
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+//app.use(express.static('public'));
+
 
 //ROUTES
+
+app.get('/loaderio-d3f911b8318a1acd79736acad0061bcf.txt', (req, res) => {
+  res.send('loaderio-d3f911b8318a1acd79736acad0061bcf');
+});
 
 app.get('/reviews', (req, res) => {
   var prodId = req.query.product_id;
