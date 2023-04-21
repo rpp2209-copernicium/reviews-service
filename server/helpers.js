@@ -13,7 +13,6 @@ const pool = new Pool({
 
 //FETCH REVIEWS FOR A GIVEN PRODUCT
 var fetchReviews = (callback, productId, sort, count, page) => {
-  pool.connect();
 
   if (count) {
     var resultCount = count;
@@ -38,6 +37,7 @@ var fetchReviews = (callback, productId, sort, count, page) => {
   }
 
   pool.query(`SELECT * FROM reviews
+  WHERE product_id = ${productId}
   ORDER BY ${orderBy} DESC
   LIMIT ${resultCount}
   OFFSET ${offSet}`)
@@ -59,20 +59,43 @@ var fetchReviews = (callback, productId, sort, count, page) => {
 
 //FETCH REVIEW METADATA FOR A GIVEN PRODUCT
 var fetchMeta = (prodId, callback) => {
-  pool.connect();
+//SETUP STRUCTURE FOR RETURN DATA
   var metadata = {
     'product_id': prodId,
     'ratings': {},
     'recommended': {},
     'characteristics': {}
   };
-  //POPULATE CHARACTERISTICS OBJECT
-  pool.query(`SELECT characteristic_id, AVG(value), name, reviews.product_id
-  FROM characteristic_review
-  JOIN characteristics ON characteristic_id = characteristics.id
-  JOIN reviews ON review_id = reviews.id
-  WHERE reviews.product_id = 20
-  GROUP BY characteristic_id, name, reviews.product_id`, (err, result) => {
+//POPULATE RECOMMEND AND RATINGS OBJECTS
+  pool.query(`SELECT COUNT (CASE WHEN rating = 1 THEN 1 END) as rating_1,
+  COUNT (CASE WHEN rating = 2 THEN 1 END) as rating_2,
+  COUNT (CASE WHEN rating = 3 THEN 1 END) as rating_3,
+  COUNT (CASE WHEN rating = 4 THEN 1 END) as rating_4,
+  COUNT (CASE WHEN rating = 5 THEN 1 END) as rating_5,
+  COUNT (CASE WHEN recommend = true THEN 1 END) as recommend_true,
+  COUNT (CASE WHEN recommend = false THEN 1 END) as recommend_false
+  FROM reviews WHERE product_id = ${prodId}`, (err, res) => {
+    if (err) {
+      callback(err);
+    } else {
+      console.log('res', res.rows);
+      var ratingsRows = res.rows;
+      var ratings = metadata['ratings'];
+      var recommended = metadata['recommended'];
+      ratings['1'] = ratingsRows[0].rating_1;
+      ratings['2'] = ratingsRows[0].rating_2;
+      ratings['3'] = ratingsRows[0].rating_3;
+      ratings['4'] = ratingsRows[0].rating_4;
+      ratings['5'] = ratingsRows[0].rating_5;
+      recommended['true'] = ratingsRows[0].recommend_true;
+      recommended['false'] = ratingsRows[0].recommend_false;
+      //POPULATE CHARACTERISTIC OBJECT
+      pool.query(`SELECT characteristic_id, AVG(value), name, reviews.product_id
+      FROM characteristic_review
+      JOIN characteristics ON characteristic_id = characteristics.id
+      JOIN reviews ON review_id = reviews.id
+      WHERE reviews.product_id = 20
+      GROUP BY characteristic_id, name, reviews.product_id`, (err, result) => {
     if (err) {
       callback(err);
     } else {
@@ -85,73 +108,15 @@ var fetchMeta = (prodId, callback) => {
           'value': currentChar.avg
         };
       }
-      //POPULATE RATINGS OBJECT
-      pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 0`, (err, result) => {
-        if (err) {
-          console.log(error);
-        } else {
-          metadata['ratings']['0'] = result.rows[0].count;
-          pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 1`, (err, result) => {
-            if (err) {
-              callback(err);
-            } else {
-              metadata['ratings']['1'] = result.rows[0].count;
-              pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 2`, (err, result) => {
-                if (err) {
-                  callback(err);
-                } else {
-                  metadata['ratings']['2'] = result.rows[0].count;
-                  pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 3`, (err, result) => {
-                    if (err) {
-                      callback(err);
-                    } else {
-                      metadata['ratings']['3'] = result.rows[0].count;
-                      pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 4`, (err, result) => {
-                        if (err) {
-                          callback(err);
-                        } else {
-                          metadata['ratings']['4'] = result.rows[0].count;
-                          pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND rating = 5`, (err, result) => {
-                            if (err) {
-                              callback(err);
-                            } else {
-                              metadata['ratings']['5'] = result.rows[0].count;
-                              //POPULATE RECOMMENDED OBJECT
-                              pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND recommend = true`, (err, result) => {
-                                if (err) {
-                                  callback(err);
-                                } else {
-                                  metadata['recommended']['true'] = result.rows[0].count;
-                                  pool.query(`SELECT COUNT (*) FROM reviews WHERE product_id = ${prodId} AND recommend = false`, (err, result) => {
-                                    if (err) {
-                                      callback(err);
-                                    } else {
-                                      metadata['recommended']['false'] = result.rows[0].count;
-                                      callback(null, metadata);
-                                    }
-                                  });
-                                }
-                              });
-                            }
-                              });
-                            }
-                          });
-                        }
-                  });
-                }
-              });
-            }
-          });
-        }
-      });
+      callback(null, metadata);
+    }
+  });
     }
   });
 };
 
 //INSERT REVIEW INTO REVIEWS TABLE
 var insertReview = (prodId, rating, summary, body, recommend, name, email, photos, characteristics, callback) => {
-
-  pool.connect();
 
   //INSERT INTO REVIEWS TABLE
   pool.query(`INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)

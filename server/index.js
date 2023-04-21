@@ -101,6 +101,10 @@ app.post('/reviews-table-insert', (req, res) => {
 //   res.send(reviewId);
 // });
 
-app.listen(port, () => {
-  console.log(`listening on port ${port}`);
+app.listen(port, (err, res) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(`listening on port ${port}`);
+  }
 });
